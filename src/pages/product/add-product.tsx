@@ -1,8 +1,6 @@
 import { useForm, Controller } from "react-hook-form";
-import ReactQuill from "react-quill";
 import { DndContext, closestCenter } from "@dnd-kit/core";
-import "react-quill/dist/quill.snow.css";
-import { setting, formats } from "../../config/quill-text.config";
+
 import {
   Select,
   SelectGroup,
@@ -22,9 +20,11 @@ import { useEffect, useState } from "react";
 import uploadImage from "../../utils/upload-image";
 import supabase from "../../config/supabase.config";
 import { upFood } from "../../services/food-service";
+import { useGetCategories } from "../../hooks/category";
 const AddProduct = () => {
   const [previewImages, setPreviewImages] = useState("");
   const [fileTemp, setFileTemp] = useState<File>(null);
+  const { data: categories, isLoading, error } = useGetCategories();
   const {
     register,
     handleSubmit,
@@ -49,29 +49,36 @@ const AddProduct = () => {
   const handleUpFood = async (data) => {
     if (!fileTemp) return;
 
-    const { Key, Id } = await uploadImage(fileTemp, "item");
-    console.log(Key);
+    const response = await uploadImage(fileTemp, "item");
+    console.log(response);
 
-    if (Key) {
-      const { publicUrl } = supabase.storage.from("item").getPublicUrl(Key);
-      console.log(publicUrl);
+    if (response?.data) {
+      const imageUrl = supabase.storage
+        .from("item")
+        .getPublicUrl(response.data.path);
+      console.log(imageUrl.data.publicUrl);
+      const publicUrl = imageUrl?.data?.publicUrl;
+      if (publicUrl) {
+        const food = {
+          ...data,
+          item_image: publicUrl,
+        };
 
-      const food = {
-        ...data,
-        item_image: publicUrl,
-      };
+        const { data: res, error: insertError } = await upFood(food);
+        console.log(res);
 
-      const { data: res, error: insertError } = await upFood(food);
-      console.log(res);
-
-      if (insertError) {
-        console.error("Lỗi insert DB:", insertError);
-      } else {
-        console.log("Thêm món ăn thành công:", res);
+        if (insertError) {
+          console.error("Lỗi insert DB:", insertError);
+        } else {
+          console.log("Thêm món ăn thành công:", res);
+        }
       }
     }
   };
 
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
   return (
     <form
       onSubmit={handleSubmit(handleUpFood)}
@@ -79,6 +86,17 @@ const AddProduct = () => {
     >
       <div className=" col-span-3 h-fit flex flex-col gap-4 ">
         <div className=" border bg-white text-sm border-gray-200 rounded-md p-4 flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="" className="text-sm text-gray-600">
+              Id
+            </label>
+            <input
+              type="text"
+              id=""
+              className=" px-2 py-1.5 font-normal outline-none border border-gray-300 rounded"
+              {...register("item_id")}
+            />
+          </div>
           <div className="flex flex-col gap-2">
             <label htmlFor="" className="text-sm text-gray-600">
               Tên món
@@ -153,26 +171,6 @@ const AddProduct = () => {
             <label htmlFor="categories" className="text-sm text-gray-600">
               Danh mục
             </label>
-            {/* <select
-            className="custom-input"
-            id="categories"
-            {...register("category")}
-          >
-            <option value=""></option>
-            {isLoadingCategories ? (
-              <span>Loading...</span>
-            ) : categories ? (
-              categories.map((category) => {
-                return (
-                  <option key={category.name} value={category.slug}>
-                    {category.name}
-                  </option>
-                );
-              })
-            ) : (
-              "Loading"
-            )}
-          </select> */}
             <Controller
               name="category_id"
               control={control}
@@ -184,20 +182,18 @@ const AddProduct = () => {
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Danh mục</SelectLabel>
-                      {/* {categories
-                        ? categories.map((category) => {
+                      {categories && categories.data
+                        ? categories.data.map((category) => {
                             return (
                               <SelectItem
-                                key={category.name}
-                                value={category.slug}
+                                key={category.category_id}
+                                value={category.category_id}
                               >
-                                {category.name}
+                                {category.category_name}
                               </SelectItem>
                             );
                           })
-                        : ""} */}
-                      <SelectItem value="CI0001">Pizza</SelectItem>
-                      <SelectItem value="bacon">Bacon</SelectItem>
+                        : ""}
                     </SelectGroup>
                   </SelectContent>
                 </Select>
