@@ -1,7 +1,7 @@
 import { type ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "../ui/button";
-import formatPrice from "../../utils/formatPrice";
+import formatPrice from "../../utils/format-price";
 export type Food = {
   item_id: string;
   item_image: string;
