@@ -1,7 +1,8 @@
 import { type ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, EditIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import formatPrice from "../../utils/format-price";
+import { Link } from "react-router-dom";
 export type Food = {
   item_id: string;
   item_image: string;
@@ -89,6 +90,19 @@ export const columns: ColumnDef<Food>[] = [
       <h3 className="font-normal text-[15px] ">
         {formatPrice(row.original.price)}
       </h3>
+    ),
+  },
+  {
+    accessorKey: "action",
+    header: ({ column }) => {
+      return <span>Thao tác</span>;
+    },
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <Link to={`/products/${row.original.item_id}`}>
+          <EditIcon className="size-5" />
+        </Link>
+      </div>
     ),
   },
 ];
