@@ -5,6 +5,7 @@ import Dashboard from "../pages/dashboard/dashboard";
 import ProductsList from "../pages/product/products-list";
 import UserList from "../pages/user/users-list";
 import AddProduct from "../pages/product/add-product";
+import UpdateProduct from "../pages/product/update-product";
 const router = createBrowserRouter([
   {
     element: <Layout />,
@@ -40,6 +41,14 @@ const router = createBrowserRouter([
           </Suspense>
         ),
         path: "/add-product",
+      },
+      {
+        element: (
+          <Suspense fallback={<p>Loading...</p>}>
+            <UpdateProduct />
+          </Suspense>
+        ),
+        path: "/products/:id",
       },
     ],
   },
