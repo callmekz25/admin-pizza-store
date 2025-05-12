@@ -1,6 +1,4 @@
 import { useForm, Controller } from "react-hook-form";
-import { DndContext, closestCenter } from "@dnd-kit/core";
-
 import {
   Select,
   SelectGroup,
@@ -10,15 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  arrayMove,
-} from "@dnd-kit/sortable";
-import { PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import uploadImage from "../../utils/upload-image";
-import supabase from "../../config/supabase.config";
+import { uploadImage } from "../../utils/up-image";
 import { upFood } from "../../services/food-service";
 import { useGetCategories } from "../../hooks/category";
 const AddProduct = () => {
@@ -49,29 +40,22 @@ const AddProduct = () => {
   const handleUpFood = async (data) => {
     if (!fileTemp) return;
 
-    const response = await uploadImage(fileTemp, "item");
-    console.log(response);
+    const publicUrl = await uploadImage(fileTemp, "item");
+    console.log(publicUrl);
 
-    if (response?.data) {
-      const imageUrl = supabase.storage
-        .from("item")
-        .getPublicUrl(response.data.path);
-      console.log(imageUrl.data.publicUrl);
-      const publicUrl = imageUrl?.data?.publicUrl;
-      if (publicUrl) {
-        const food = {
-          ...data,
-          item_image: publicUrl,
-        };
+    if (publicUrl) {
+      const food = {
+        ...data,
+        item_image: publicUrl,
+      };
 
-        const { data: res, error: insertError } = await upFood(food);
-        console.log(res);
+      const { data: res, error: insertError } = await upFood(food);
+      console.log(res);
 
-        if (insertError) {
-          console.error("Lỗi insert DB:", insertError);
-        } else {
-          console.log("Thêm món ăn thành công:", res);
-        }
+      if (insertError) {
+        console.error("Lỗi insert DB:", insertError);
+      } else {
+        console.log("Thêm món ăn thành công:", res);
       }
     }
   };
