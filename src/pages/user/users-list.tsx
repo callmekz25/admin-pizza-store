@@ -6,6 +6,10 @@ const UserList = () => {
   if (isLoading) {
     return <p>Loading...</p>;
   }
+  if (error) {
+    console.log(error);
+    return <p>Lỗi...</p>;
+  }
 
   return (
     <div className="">
@@ -13,7 +17,10 @@ const UserList = () => {
         <h3 className="text-xl font-medium">Khách Hàng</h3>
       </div>
       <div className="">
-        <DataTable columns={columns} data={users.data} />
+        <DataTable
+          columns={columns}
+          data={users.data && users.data.length > 0 ? users?.data : []}
+        />
       </div>
     </div>
   );
