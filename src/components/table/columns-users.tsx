@@ -8,6 +8,8 @@ export type User = {
   user_image: string;
   user_email: string;
   phone_number: string;
+  user_avatar: string;
+  is_active: boolean;
   role_id: string;
   role: {
     role_name: string;
@@ -28,7 +30,7 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       return (
         <img
-          src={row.original.user_image}
+          src={row.original.user_avatar}
           alt={row.original.user_name}
           className="size-18 object-contain"
         />
@@ -85,6 +87,25 @@ export const columns: ColumnDef<User>[] = [
     },
     cell: ({ row }) => (
       <h3 className="font-normal text-[15px] ">{row.original.phone_number}</h3>
+    ),
+  },
+  {
+    accessorKey: "is_active",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Trạng thái
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <h3 className="font-normal text-[15px] ">
+        {row.original.is_active ? "Đã xác thực" : "Chưa xác thực"}
+      </h3>
     ),
   },
 ];
