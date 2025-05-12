@@ -8,7 +8,7 @@ const ProductsList = () => {
   const { data: foods, isLoading, error } = useGetFoods();
 
   if (isLoading) {
-    return <div>Loading...</div>; // Hiển thị khi đang tải dữ liệu
+    return <div>Loading...</div>;
   }
 
   return (
